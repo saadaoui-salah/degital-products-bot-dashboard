@@ -2,6 +2,8 @@ from users.models import Order, User
 from django.http import JsonResponse
 import json
 
+
+
 def create_user(request):
     data = json.loads(request.body)
     user = User.objects.create(
@@ -9,7 +11,8 @@ def create_user(request):
         balance=0,
         phone_number=data['phone_number'],
         tg_username=data['tg_username'],
-        tg_id=data['tg_id']
+        tg_id=data['tg_id'],
+        chat_id=data["chat_id"]
     )
     user.save()
     return JsonResponse({"success":"user created"})
