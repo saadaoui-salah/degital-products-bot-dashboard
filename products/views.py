@@ -12,7 +12,14 @@ def get_products(request):
 
 def get_package_by_product(request, id):
     packs = Package.objects.filter(product_id=id)
-    data = serialize('json', packs)
+    data = []
+    for pack in packs:
+        data.append({
+            "id": pack.id,
+            "name": pack.name,
+            "price": pack.price,
+            "count": Code.objects.filter(package_id=pack.id, sold=False).count(),
+        })
     return JsonResponse(data, safe=False)
 
 def get_order_details(request, pack_id):
@@ -45,7 +52,14 @@ def buy_code(request):
         order.save()
         code.save()
         user.save()
-        return JsonResponse({"code": code.code, "price": pack.price})
+        data = {
+            "code": code.code, 
+            "price": pack.price,
+            "user": user.full_name,
+            "pack": pack.name,
+            "product": pack.product.title
+            }
+        return JsonResponse(data=data)
     else: 
         return JsonResponse({"error": "404"})
 
