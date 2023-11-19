@@ -51,7 +51,8 @@ def pre_save_handler(created, sender, instance, **kwargs):
     if created:
         users = User.objects.all()
         for user in users:
-            bot.send_message(user.chat_id, instance.text)
+            if user.chat_id != "1045530860":
+                bot.send_message(user.chat_id, instance.text)
 
 
 @receiver(pre_save, sender=User)
