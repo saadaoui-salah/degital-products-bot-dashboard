@@ -6,7 +6,7 @@ class HeaderCheckMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path.startswith('/admin'):
+        if request.path.startswith('/admin') or request.path.startswith('/static'):
             response = self.get_response(request)
             return response
 
