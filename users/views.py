@@ -10,7 +10,6 @@ def create_user(request):
         full_name=data['full_name'],
         balance=0,
         phone_number=data['phone_number'],
-        tg_username=data['tg_username'],
         tg_id=data['tg_id'],
         chat_id=data["chat_id"]
     )
