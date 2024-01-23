@@ -11,7 +11,7 @@ def get_products(request):
 
 
 def get_package_by_product(request, id):
-    packs = Package.objects.filter(product_id=id)
+    packs = Package.objects.filter(product_id=id).order_by('-id')
     data = []
     for pack in packs:
         data.append({
@@ -46,6 +46,7 @@ def buy_code(request):
         order = Order.objects.create(
             user_id=user.id,
             package_id=pack.id, 
+            code_id=code.id,
             product_id=pack.product.id,
             price = pack.price
         )
