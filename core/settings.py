@@ -1,6 +1,19 @@
 from pathlib import Path
 import os
 
+JAZZMIN_SETTINGS = {
+    "site_title": "DPS Gross Bot",
+    "site_header": "DPS Gross Bot",
+    # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
+    "site_brand": "DPS Gross Bot",
+
+    "welcome_sign": "Welcome to DPS Gross Bot Dashboard",
+
+    # Copyright on the footer
+    "copyright": "Salah Saadaoui | salahsaadaoui8@gmail.com",
+
+}
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-1$5ey=2do4^%*pxpt5pc-$n-5mydwx_i&&kc5gsh^(77g^j-or'
@@ -19,8 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
     'products',
-    'users'
 ]
 
 MIDDLEWARE = [
@@ -38,7 +51,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -59,6 +72,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
 #}
+
 
 DATABASES = {
     'default': {
