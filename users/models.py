@@ -28,6 +28,8 @@ class User(DirtyFieldsMixin, models.Model):
     tg_id = models.CharField(unique=True, max_length=100)
     chat_id = models.CharField(max_length=200)
     active = models.BooleanField(default=False)
+    group_member = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.tg_id} || {self.full_name}"
@@ -38,7 +40,7 @@ class Order(models.Model):
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     code = models.ForeignKey(Code, on_delete=models.CASCADE, null=True, blank=True)
     price = models.IntegerField()
-    date = models.DateTimeField(null=True, blank=True, auto_now=True)
+    date = models.DateTimeField()
 
     def __str__(self) -> str:
         return f"{self.user.full_name} || {self.code.code if self.code else ''}"
@@ -48,6 +50,17 @@ class Notification(models.Model):
 
     def __str__(self) -> str:
         return self.text
+    
+class Transaction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.IntegerField()
+    created_at = models.DateTimeField()
+
+    def __str__(self) -> str:
+        return f"{self.user} recived {self.amount} points"
+
+
+
 
 @receiver(post_save, sender=Notification)
 def pre_save_handler(created, sender, instance, **kwargs):
@@ -101,3 +114,11 @@ def pre_save_handler(sender, instance, **kwargs):
                 reply_markup=markup)
     except Exception as e :
         print(e)
+
+
+@receiver(post_save, sender=Transaction)
+def pre_save_handler(created, sender, instance, **kwargs):
+    if created:
+        instance.user.balance += instance.amount
+        instance.user.save()
+        instance.save()
