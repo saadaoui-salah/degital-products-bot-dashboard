@@ -33,7 +33,11 @@ class PackageAdmin(admin.ModelAdmin):
 class CodeAdmin(admin.ModelAdmin):
     model = Code
     list_display = ['code', 'sold']
-
+    search_fields = [
+        'code',
+        'package__product__title',
+        'package__name'
+    ]
 
 
 
