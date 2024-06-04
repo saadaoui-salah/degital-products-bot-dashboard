@@ -20,7 +20,6 @@ history_btn = "📋 تعاملاتي"
 buy_btn = "شراء"
 
 
-# Create your models here.
 class User(DirtyFieldsMixin, models.Model):
     full_name = models.CharField(max_length=200)
     balance = models.IntegerField()
@@ -35,12 +34,22 @@ class User(DirtyFieldsMixin, models.Model):
         return f"{self.tg_id} || {self.full_name}"
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    STATUS_CHOICES = [
+        ('Done', 'DONE'),
+        ('In Progress', 'IN PROGRESS'),
+        ('Not Started', 'NOT STARTED'),
+        ('Have Problems', 'HAVE PROBLEMS'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="order_user")
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name="admin_user", limit_choices_to={'is_admin': True})
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     code = models.ForeignKey(Code, on_delete=models.CASCADE, null=True, blank=True)
+    extra = models.CharField(max_length=500, null=True, blank=True)
     price = models.IntegerField()
     date = models.DateTimeField()
+    status = models.CharField(max_length=500, choices=STATUS_CHOICES, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.user.full_name} || {self.code.code if self.code else ''}"
@@ -59,6 +68,13 @@ class Transaction(models.Model):
     def __str__(self) -> str:
         return f"{self.user} recived {self.amount} points"
 
+class Report(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True, blank=True)
+    reason = models.TextField()
+
+    def __str__(self) -> str:
+        return f"{self.user}"
 
 
 
@@ -73,6 +89,44 @@ def pre_save_handler(created, sender, instance, **kwargs):
                     print("--------- Notification sent ---------")
                 except Exception as e: 
                     print(e)
+
+
+order_message = """
+New order created 
+    
+    Order id: {order_id}
+    package: {package}
+    user id: {user_id} || {user_name}
+    request text: {request_text}
+
+"""
+
+strat_btn = "ابدء"
+reject_btn = "لن نستطيع"
+
+@receiver(post_save, sender=Order)
+def pre_save_handler(created, sender, instance, **kwargs):
+    if created:
+        users = User.objects.filter(is_admin=True)
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            types.InlineKeyboardButton(strat_btn, callback_data=f"order_status=start&order_id={instance.id}"),
+            types.InlineKeyboardButton(reject_btn, callback_data=f"order_status=reject&order_id={instance.id}")
+        )
+        for user in users:
+            message = order_message.format(
+                order_id=instance.id, 
+                package=instance.package.name,
+                user_id=instance.user.tg_id,
+                user_name=instance.user.full_name,
+                request_text=instance.extra
+                )
+            try:
+                bot.send_message(user.chat_id, message, reply_markup=markup)
+                print("--------- Notification sent ---------")
+            except Exception as e: 
+                print(e)
+
 
 @receiver(pre_save, sender=User)
 def pre_save_handler(sender, instance, **kwargs):

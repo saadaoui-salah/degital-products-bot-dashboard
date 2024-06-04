@@ -6,16 +6,28 @@ from django.dispatch import receiver
 class Product(models.Model):
 
     title = models.CharField(max_length=200)
+    description = models.TextField(null=True, blank=True)
+    image = models.ImageField(upload_to="static/products", null=True, blank=True)
     created_at = models.DateTimeField(null=True, blank=True, auto_now=True)
+    
     def __str__(self) -> str:
         return self.title 
     
 
 class Package(models.Model):
+
+    CHOICES = [
+        ('NORMAL','Normal'),
+        ('IN DEMAND', 'In Demand')
+    ]
+
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     price = models.IntegerField()
     created_at = models.DateTimeField(null=True, blank=True, auto_now=True)
+    description = models.TextField(null=True, blank=True)
+    image = models.ImageField(upload_to="static/packs", null=True, blank=True)
+    choices = models.CharField(max_length=100, choices=CHOICES, default=CHOICES[0][0]) 
 
     def __str__(self) -> str:
         return self.name
