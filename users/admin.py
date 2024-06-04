@@ -32,7 +32,7 @@ class OrderInline(admin.TabularInline):
     model = Order
     extra = 0
     readonly_fields = ['product', 'package', 'code', 'price', 'date']
-
+    fk_name = 'user'
 
 class TransactionInline(admin.TabularInline):
     model = Transaction
@@ -73,6 +73,7 @@ class UserAdmin(admin.ModelAdmin):
         "phone_number",
         "active",
         "is_admin",
+        "group_member",
         "orders",
         "amount_spent_in_orders",
         "transactions",
