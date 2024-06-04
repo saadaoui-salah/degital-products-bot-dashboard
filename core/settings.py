@@ -4,14 +4,9 @@ import os
 JAZZMIN_SETTINGS = {
     "site_title": "DPS Gross Bot",
     "site_header": "DPS Gross Bot",
-    # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "DPS Gross Bot",
-
     "welcome_sign": "Welcome to DPS Gross Bot Dashboard",
-
-    # Copyright on the footer
     "copyright": "Salah Saadaoui | salahsaadaoui8@gmail.com",
-
 }
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,6 +17,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'Authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    "User"
+]
 
 
 INSTALLED_APPS = [
@@ -81,7 +88,7 @@ DATABASES = {
         'USER': os.environ['DB_USER'],
         'PASSWORD': os.environ['DB_PASSWORD'],
         'HOST': os.environ['DB_HOST'],  # Set to the host where your PostgreSQL server is running
-        'PORT': '20936',      # Set to the port your PostgreSQL server is listening on
+        'PORT': os.environ['DB_PORT'],      # Set to the port your PostgreSQL server is listening on
     }
 }
 
@@ -104,6 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CSRF_TRUSTED_ORIGINS = [
     "https://stale-connection-production.up.railway.app",
+    "https://stale-connection-test.up.railway.app"
 ]
 
 LANGUAGE_CODE = 'en-us'
