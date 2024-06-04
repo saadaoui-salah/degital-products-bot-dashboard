@@ -1,4 +1,4 @@
-
+import os
 from django.http import HttpResponseForbidden
 
 class HeaderCheckMiddleware:
@@ -11,7 +11,7 @@ class HeaderCheckMiddleware:
             return response
 
         required_header = 'Authorizations'
-        if request.headers.get(required_header) != 'ttg45':
+        if request.headers.get(required_header) != os.environ.get('API_TOKEN'):
             return HttpResponseForbidden("Forbidden: Missing or incorrect header value.")
 
         response = self.get_response(request)
