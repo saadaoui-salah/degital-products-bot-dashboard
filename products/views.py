@@ -89,7 +89,7 @@ def buy_code(request):
             price = pack.price, 
             date = timezone.now() 
         )
-        if pack.choices == Package.CHOICES[1][0]:
+        if pack.choices == Package.CHOICES[0][0]:
             order.status = Order.STATUS_CHOICES[2][0]
             order.extra = data.get('extra')
 
