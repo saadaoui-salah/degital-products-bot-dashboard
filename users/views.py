@@ -80,7 +80,7 @@ def update_order(request):
     data = json.loads(request.body)
     order = Order.objects.filter(id=data['order']).get()
     if data['status'] == Order.STATUS_CHOICES[1][0]:
-        num = Order.objects.filter(status=Order.STATUS_CHOICES[1][0]).count()
+        num = Order.objects.filter(status=Order.STATUS_CHOICES[2][0]).count()
         bot.send_message(order.user.chat_id, client_message.format(num))
     
     elif data['status'] == Order.STATUS_CHOICES[0][0]:
@@ -89,7 +89,7 @@ def update_order(request):
     
     order.status = data['status']
     order.save()
-    return JsonResponse({})
+    return JsonResponse({"s":"q"})
 
 @validate_request_header
 def create_report(request):

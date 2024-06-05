@@ -79,32 +79,31 @@ def buy_code(request):
     pack = Package.objects.filter(id=data['pack_id']).get()
     user = User.objects.filter(tg_id=data['tg_id']).get()          
     if user.balance >= pack.price: 
-        code.sold = True
         user.balance -= pack.price 
         order = Order.objects.create(
             user_id=user.id,
             package_id=pack.id, 
-            code_id=code.id,
+            code_id=code.id if pack.choices == Package.CHOICES[0][0] else None,
             product_id=pack.product.id,
             price = pack.price, 
-            date = timezone.now() 
+            date = timezone.now(),
+            status= Order.STATUS_CHOICES[2][0] if pack.choices == Package.CHOICES[1][0] else None, 
+            extra = data.get('extra') if pack.choices == Package.CHOICES[1][0] else None 
         )
-        if pack.choices == Package.CHOICES[0][0]:
-            order.status = Order.STATUS_CHOICES[2][0]
-            order.extra = data.get('extra')
-
-        order.save()
-        code.save()
-        user.save()
         data = {
-            "code": code.code, 
             "price": pack.price,
             "user": user.full_name,
             "pack": pack.name,
             "product": pack.product.title
             }
+        if pack.choices == Package.CHOICES[0][0]:
+            code.sold = True
+            code.save()
+            data["code"] = code.code, 
         if pack.choices == Package.CHOICES[1][0]:
-            data['order'] = Order.objects.filter(status=Order.STATUS_CHOICES[1][0])
+            data['order'] = Order.objects.filter(status=Order.STATUS_CHOICES[2][0]).count()
+        order.save()
+        user.save()
         return JsonResponse(data=data)
     else: 
         return JsonResponse({"error": "404"})

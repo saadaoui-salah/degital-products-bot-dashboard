@@ -106,7 +106,7 @@ reject_btn = "لن نستطيع"
 
 @receiver(post_save, sender=Order)
 def pre_save_handler(created, sender, instance, **kwargs):
-    if created and instance.package.choices == Package.CHOICES[0][0]:
+    if created and instance.package.choices == Package.CHOICES[1][0]:
         users = User.objects.filter(is_admin=True)
         markup = types.InlineKeyboardMarkup(row_width=2)
         markup.add(
