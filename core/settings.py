@@ -73,13 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-#DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-#    }
-#}
-
 
 DATABASES = {
     'default': {
@@ -91,6 +84,13 @@ DATABASES = {
         'PORT': os.environ['DB_PORT'],      # Set to the port your PostgreSQL server is listening on
     }
 }
+
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -107,6 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+DATA_UPLOAD_MAX_NUMBER_FIELDS = None
 
 
 CSRF_TRUSTED_ORIGINS = [

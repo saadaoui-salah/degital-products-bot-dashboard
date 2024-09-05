@@ -23,12 +23,14 @@ buy_btn = "شراء"
 class User(DirtyFieldsMixin, models.Model):
     full_name = models.CharField(max_length=200)
     balance = models.IntegerField()
+    spent = models.IntegerField()
     phone_number = models.CharField(max_length=100)
     tg_id = models.CharField(unique=True, max_length=100)
     chat_id = models.CharField(max_length=200)
     active = models.BooleanField(default=False)
     group_member = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    has_free_spend = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.tg_id} || {self.full_name}"
@@ -67,6 +69,11 @@ class Transaction(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} recived {self.amount} points"
+
+class CreditPayment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    amount = models.IntegerField()
+    date = models.DateTimeField(auto_now_add=True)
 
 class Report(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

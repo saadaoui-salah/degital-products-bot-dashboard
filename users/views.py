@@ -1,10 +1,11 @@
 from telebot import types
 from products.views import validate_request_header
-from users.models import Order, User, Report
+from users.models import Order, User, Report, CreditPayment
 from django.http import JsonResponse
 import json
 from django.shortcuts import redirect
-from .models import bot
+from .models import bot, CreditPayment
+import json
 
 group_notification = """
 السلام عليكم ورحمه الله جماعة 🌹 
@@ -70,21 +71,33 @@ def add_to_group(request, user_id):
     
     return redirect("/admin/users/user/")
 
+def reset_spend(request, user_id):
+    user = User.objects.get(pk=user_id)
+    CreditPayment.object.create(
+        user=user,
+        amount=user.spent
+    )
+    user.spent = 0
+    user.save()
+    return redirect("/admin/users/user/")
 
-import json
 
 def update_order(request):
     client_message = """
+    لقد بدأنا في انجاز الأوردر الخاص بك سوف يتم إشعارك فور إتمام الإنتهاء !
     {} ترتيبك
     """
     data = json.loads(request.body)
     order = Order.objects.filter(id=data['order']).get()
+    if order.status == data['status']:
+        return JsonResponse({'error': 'order updated'})
     if data['status'] == Order.STATUS_CHOICES[1][0]:
         num = Order.objects.filter(status=Order.STATUS_CHOICES[2][0]).count()
         bot.send_message(order.user.chat_id, client_message.format(num))
     
     elif data['status'] == Order.STATUS_CHOICES[0][0]:
-        bot.send_message(order.user.chat_id, "your order is completed")
+        bot.send_message(order.user.chat_id, f"""لقد تم اتمام الأوردر الخاص بك رقم : {order.id}
+بنجاح !""")
     
     
     order.status = data['status']
@@ -94,8 +107,13 @@ def update_order(request):
 @validate_request_header
 def create_report(request):
     data = json.loads(request.body)
+    if Report.objects.filter(order_id=data['order']).exist():
+        return JsonResponse({'error': 'order updated'})
     order = Order.objects.filter(id=data['order']).get()
-    not_completed_message = "your order can't be completed bcz : {}"
+    not_completed_message = f"""لم نستطع اتمام الاوردر الخاص بك رقم : {order.id}
+        السبب : {data['report']}
+
+        """
     bot.send_message(
         order.user.chat_id, 
         not_completed_message.format(data['report'])

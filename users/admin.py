@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils import timezone
-from .models import Notification, Order, Transaction, User
+from .models import Notification, Order, Transaction, User, CreditPayment
 from django.contrib.auth.models import User as CS
 from django.contrib.auth.models import Group
 from django.db.models import Sum
@@ -42,6 +42,7 @@ class TransactionInline(admin.TabularInline):
 class OrdersAdmin(admin.ModelAdmin):
     change_list_template = 'admin/orders/change_list.html'
     list_display = ['user', 'product', 'package', 'code', 'price', 'date']
+    list_filter = ['status']
     search_fields =  [
         'user__full_name', 
         'user__tg_id', 
@@ -78,7 +79,9 @@ class UserAdmin(admin.ModelAdmin):
         "amount_spent_in_orders",
         "transactions",
         "total_transaction_amount",
-        'add_to_group', 
+        'add_to_group',
+        'spent',
+        'reset_spend'
     ]
     search_fields =  [
         'full_name', 
@@ -110,8 +113,16 @@ class UserAdmin(admin.ModelAdmin):
             return format_html(f"""
                                <a href="/user/add-to-group/{obj.id}" class="btn btn-primary">Add To Group</a>
                                """)
-        
+    
+    def reset_spend(self, obj):
+        if obj.spent > 0:
+            return format_html('<button type="submit" disabled class="btn btn-primary">Reset</button>')
+        else:
+            return format_html(f"""
+                               <a href="/user/reset/{obj.id}" class="btn btn-primary">Reset</a>
+                               """)
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Order, OrdersAdmin)
 admin.site.register(Transaction,TransactionAdmin)
+admin.site.register(CreditPayment)

@@ -78,8 +78,10 @@ def buy_code(request):
     code = Code.objects.filter(package_id=data['pack_id'], sold=False).first()
     pack = Package.objects.filter(id=data['pack_id']).get()
     user = User.objects.filter(tg_id=data['tg_id']).get()          
-    if user.balance >= pack.price: 
-        user.balance -= pack.price 
+    if user.balance >= pack.price or user.has_free_spend: 
+        if not user.has_free_spend:
+            user.balance -= pack.price 
+        user.spent += pack.price 
         order = Order.objects.create(
             user_id=user.id,
             package_id=pack.id, 
