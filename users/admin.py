@@ -27,6 +27,17 @@ class TransactionAdmin(admin.ModelAdmin):
         extra_context['monthly_stats']['points'] = earning or 0
         return super().changelist_view(request, extra_context=extra_context)
 
+class CreditPaymentAdmin(admin.ModelAdmin):
+    model = CreditPayment
+    list_display = ['user', 'amount', 'date']
+    change_list_template = 'admin/credit_payment/change_list.html'
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        earning = User.objects.all().aggregate(total=Sum('spent'))['total']
+        extra_context['monthly_stats'] = {}
+        extra_context['monthly_stats']['points'] = earning or 0
+        return super().changelist_view(request, extra_context=extra_context)
 
 class OrderInline(admin.TabularInline):
     model = Order
@@ -125,4 +136,4 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Order, OrdersAdmin)
 admin.site.register(Transaction,TransactionAdmin)
-admin.site.register(CreditPayment)
+admin.site.register(CreditPayment, CreditPaymentAdmin)
